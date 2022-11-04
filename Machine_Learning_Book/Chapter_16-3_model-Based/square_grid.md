@@ -1,6 +1,6 @@
 4*4方格世界如下图所示：
 
-![节点](.//Users/yeungharvey/Documents/ReinforcementLearning/Reinforcement-Learning/Machine\ Learning\ Book/Chapter\ 16-3\ model-Based/grid.png) 
+![节点](https://github.com/hongliw/Reinforcement-Learning/tree/main/Machine_Learning_Book/Chapter_16-3_model-Based/grid.png) 
 
 
 1、状态空间 S：S1-S14为非终止状态；S0、S15为终止状态；
