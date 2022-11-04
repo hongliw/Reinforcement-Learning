@@ -1,25 +1,15 @@
 """
-Implementation of small grid world example illustrated by David Silver
-in his Reinforcement Learning Lecture3 - Planning by Dynamic Programming.
-Author: Jessica
-Data: October 27, 2022
-
-The value function converges to:
-  0.00 -14.00 -20.00 -22.00
-
--14.00 -18.00 -20.00 -20.00
-
--20.00 -20.00 -18.00 -14.00
-
--22.00 -20.00 -14.00   0.00
+评估4*4方格随机策略π
+4*4方格详细说明见square_grid.txt
 """
 import numpy as np
 
+# nS：状态个数，nA：行为个数
 nS, nA = 16, 4
-# 状态空间
-states = [i for i in range(16)]
+# 声明状态空间
+states = [i for i in range(nS)]
 # 声明行为空间
-actions = np.array(['n', 'e', 's', 'w'])
+actions = ['n', 'e', 's', 'w']
 # 结合方格世界的布局特点，声明行为对状态的改变
 ds_actions = {'n': -4, 'e': 1, 's': 4, 'w': -1}
 # 声明衰减系数
@@ -54,56 +44,6 @@ def isTerminateState(s):
     return s in [0, 15]
 
 
-def get_action_name(index):
-    if index == 0:
-        return 'n'
-    elif index == 1:
-        return 'e'
-    elif index == 2:
-        return 's'
-    else:
-        return 'w'
-
-
-def value_iteration():
-    """
-    值迭代(value iteration)
-    """
-    values = np.zeros(nS)
-    newValues = values.copy()
-    # 收敛阈值
-    THETA = 0.0001
-    delta = float('inf')
-
-    round_num = 0
-
-    while delta > THETA:
-        print('\nRound Number:' + str(round_num))
-        round_num += 1
-
-        print('Expected value in value iteration:')
-        printValue(values)
-
-        delta = 0
-
-        for s in states:
-            expected_value = float('-inf')
-            if not isTerminateState(s):
-                for action in actions:
-                    # 获取下一个状态
-                    next_state = nextState(s, action)
-
-                    value = rewardOf(s) + gamma * values[next_state]
-                    expected_value = max(expected_value, value)
-
-                delta = max(delta, np.abs(expected_value - values[s]))
-                newValues[s] = expected_value
-
-        values = newValues.copy()
-
-    return values
-
-
 def printValue(values):
     """
     输出状态价值
@@ -115,25 +55,59 @@ def printValue(values):
             print('\n')
 
 
+def updateValue(values):
+    """
+    迭代更新状态值函数values
+    """
+    newValues = np.zeros(nS)
+    delta = 0
+    # 遍历所有的状态
+    for s in states:
+        expected_value = float('-inf')
+
+        if not isTerminateState(s):
+            # 即时奖励
+            r = rewardOf(s)
+            # 产生随机行为动作
+            for a, a_name in enumerate(actions):
+                # 获取下一个状态
+                next_state = nextState(s, a_name)
+                # 计算公式参考P382 值函数改进公式
+                # gamma=1.0
+                # 执行动作a转移到next_state的概率为100%，且执行动作a只能转移到next_state P(next_state|s, a) = 100%
+                # 将之前的求和改为求最大值
+                value = r + gamma * values[next_state]
+                expected_value = max(expected_value, value)
+
+            # 记录迭代后值函数的最大变化量
+            delta = max(delta, np.abs(expected_value - values[s]))
+            # 更新newValues
+            newValues[s] = expected_value
+
+    return newValues, delta
+
+
 def next_best_action(s, values):
+    """
+    获取最优动作
+    """
     action_values = np.zeros(nA)
 
-    for a, action_name in enumerate(actions):
-        next_state = nextState(s, action_name)
+    for a, a_name in enumerate(actions):
+        next_state = nextState(s, a_name)
         action_values[a] = rewardOf(s) + gamma * values[next_state]
 
     return np.argmax(action_values), np.max(action_values)
 
 
-def optimal_policy():
+def get_optimal_policy(values):
     """
-    最有策略
+    最优策略
     """
-    # 初始policy策略
-    policy = np.tile(np.array([1 / nA for _ in range(nA)]), (nS, 1))
+    # 策略初始化
+    policy = np.tile(np.zeros(nA), (nS, 1))
 
-    values = value_iteration()
-
+    # 最优策略
     for s in states:
         best_action, best_action_value = next_best_action(s, values)
         policy[s] = np.eye(nA)[best_action]
@@ -141,10 +115,30 @@ def optimal_policy():
     return policy
 
 
-def main():
-    policy = optimal_policy()
+def main(threshold=0.0001):
+    """
+    值迭代(value iteration)算法
+    """
+    # 声明状态值函数values
+    values = np.zeros(nS)
+
+    delta = float('inf')
+    round_num = 0
+
+    # 若值函数的改变小于threshold时，则停止
+    while delta >= threshold:
+        print('Round Number: ', round_num)
+        round_num += 1
+
+        # 更新迭代值函数
+        values, delta = updateValue(values)
+
+    print('The value function converges to:')
+    printValue(values)
+
+    optimal_policy = get_optimal_policy(values)
     print('The optimal policy is:')
-    print(policy)
+    print(optimal_policy)
 
 
 if __name__ == '__main__':
