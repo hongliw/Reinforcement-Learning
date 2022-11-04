@@ -1,5 +1,5 @@
 """
-评估4*4方格随机策略π
+评估4*4方格世界的随机策略π
 4*4方格详细说明见square_grid.md
 """
 import numpy as np

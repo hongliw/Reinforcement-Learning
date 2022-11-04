@@ -1,5 +1,5 @@
 """
-对4*4方格随机策略π利用策略迭代法(policy iteration)进行策略改进，求解最优策略
+对4*4方格世界的随机策略π利用策略迭代法(policy iteration)进行策略改进，求解最优策略
 4*4方格详细说明见square_grid.md
 """
 import numpy as np
