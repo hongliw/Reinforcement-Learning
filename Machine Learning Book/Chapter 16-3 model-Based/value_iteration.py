@@ -1,6 +1,6 @@
 """
-评估4*4方格随机策略π
-4*4方格详细说明见square_grid.txt
+对4*4方格随机策略π利用值迭代法(value iteration)进行值函数改进，求解最优策略
+4*4方格详细说明见square_grid.md
 """
 import numpy as np
 
