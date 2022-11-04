@@ -82,8 +82,8 @@ def updateValue(values, policy):
 
             # 记录迭代后值函数的最大变化量
             delta = max(delta, np.abs(expected_value - values[s]))
-        # 更新newValues
-        newValues[s] = expected_value
+            # 更新newValues
+            newValues[s] = expected_value
 
     return newValues, delta
 
