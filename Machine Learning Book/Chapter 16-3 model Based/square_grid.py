@@ -55,7 +55,7 @@ def printValue(values):
             print('\n')
 
 
-def updateValue(values):
+def updateValue(values, policy):
     """
     迭代更新状态值函数values
     """
@@ -63,30 +63,37 @@ def updateValue(values):
     delta = 0
     # 遍历所有的状态
     for s in states:
-        # 若状态s为终止状态
-        if isTerminateState(s):
-            continue
+        expected_value = 0
 
-        new_value = 0
-        # 即时奖励
-        r = rewardOf(s)
-        # 产生随机行为动作
-        for a, a_name in enumerate(actions):
-            next_state = nextState(s, a_name)
-            # 计算公式参考P378 gamma折扣累积奖赏
-            # gamma=1.0
-            # 当前策略产生动作a的概率为π(s, a) = 1/4
-            # 执行动作a转移到next_state的概率为100%，且执行动作a只能转移到next_state P(next_state|s, a) = 100%
-            new_value += 1.00 / 4 * (r + gamma * values[next_state])
-        # 记录迭代后值函数的最大变化量
-        delta = max(delta, np.abs(new_value - values[s]))
+        if not isTerminateState(s):
+            # 即时奖励
+            r = rewardOf(s)
+            # 产生随机行为动作
+            for a, action_prob in enumerate(policy[s]):
+                # 获取下一个状态
+                a_name = actions[a]
+                next_state = nextState(s, a_name)
+                # 计算公式参考P378 gamma折扣累积奖赏
+                # gamma=1.0
+                # 当前策略产生动作a的概率为π(s, a) = 1/4
+                # 执行动作a转移到next_state的概率为100%，且执行动作a只能转移到next_state P(next_state|s, a) = 100%
+                expected_value += action_prob * (r + gamma * values[next_state])
+
+            # 记录迭代后值函数的最大变化量
+            delta = max(delta, np.abs(expected_value - values[s]))
         # 更新newValues
-        newValues[s] = new_value
+        newValues[s] = expected_value
 
     return newValues, delta
 
 
-def evaluate_stochastic_policy(threshold=0.0001):
+def policy_evaluation(threshold=0.0001):
+    """
+    策略评估
+    """
+    # 随机策略π
+    policy = np.tile(np.array([1.00 / nA for _ in range(nA)]), (nS, 1))
+
     # 声明状态值函数values
     values = np.zeros(nS)
 
@@ -94,11 +101,11 @@ def evaluate_stochastic_policy(threshold=0.0001):
     # 若值函数的改变小于threshold时，则停止
     while delta >= threshold:
         # 更新迭代值函数
-        values, delta = updateValue(values)
+        values, delta = updateValue(values, policy)
 
     print('The value function converges to:')
     printValue(values)
 
 
 if __name__ == '__main__':
-    evaluate_stochastic_policy()
+    policy_evaluation()
