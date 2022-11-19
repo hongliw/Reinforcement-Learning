@@ -4,14 +4,10 @@
 import numpy as np
 import gym
 import sys
-sys.path.append('..')
-from plot_utils import plot_blackjack_values, plot_policy
+sys.path.append('../..')
+from utils import ob2state, plot_blackjack_values, plot_policy
 
 env = gym.make('Blackjack-v1')
-
-
-def ob2state(observation):
-    return observation[0], observation[1], int(observation[2])
 
 
 def generate_episode_from_stochastic_start(env, policy):
@@ -51,7 +47,7 @@ def generate_episode_from_stochastic_start(env, policy):
     return episode, reward
 
 
-def monte_carlo_with_exploring_start(env, policy, episode_num, gamma=1.0):
+def monte_carlo_with_exploring_start(env, policy, episode_num):
     """
     求解带起始探索的on-policy最优策略
     """
@@ -69,7 +65,7 @@ def monte_carlo_with_exploring_start(env, policy, episode_num, gamma=1.0):
             N[state][action] += 1
             # 状态-动作值函数迭代更新
             Q[state][action] += (reward - Q[state][action]) / N[state][action]
-            # 策略迭代更新
+            # 策略改进
             best_action = np.argmax(Q[state])
             policy[state] = 0.
             policy[state][best_action] = 1.
@@ -86,13 +82,13 @@ def main():
     policy, Q = monte_carlo_with_exploring_start(env, policy, episode_num=500000)
 
     # 最优值函数
-    V = (policy * Q).sum(axis=-1)
+    V = Q.max(axis=-1)
 
     # plot the optimal state-value function
-    plot_blackjack_values(V, img_name='MC_control.png')
+    plot_blackjack_values(V, img_name='./results/MC_control_values.png')
 
     # plot the optimal policy
-    plot_policy(policy.argmax(-1), img_name='MC_control_policy.png')
+    plot_policy(policy.argmax(-1), img_name='./results/MC_control_policy.png')
 
 
 if __name__ == '__main__':

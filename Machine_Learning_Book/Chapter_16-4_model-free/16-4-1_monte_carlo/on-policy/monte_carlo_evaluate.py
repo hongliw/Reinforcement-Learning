@@ -5,14 +5,10 @@ import gym
 from collections import defaultdict
 import numpy as np
 import sys
-sys.path.append('..')
-from plot_utils import plot_blackjack_values
+sys.path.append('../..')
+from utils import ob2state, plot_blackjack_values
 
 env = gym.make('Blackjack-v1')
-
-
-def ob2state(observation):
-    return observation[0], observation[1], int(observation[2])
 
 
 def generate_episode_from_policy(env, policy):
@@ -68,7 +64,7 @@ def main():
     # 从状态-动作值函数求出状态值函数
     V = (Q * policy).sum(axis=-1)
 
-    plot_blackjack_values(V, img_name='MC_prediction_values.png')
+    plot_blackjack_values(V, img_name='./results/MC_evaluate_values.png')
 
 
 if __name__ == '__main__':

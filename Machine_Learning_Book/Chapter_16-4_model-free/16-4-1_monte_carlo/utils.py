@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
+def ob2state(observation):
+    return observation[0], observation[1], int(observation[2])
+
 def plot_blackjack_values(V, img_name=None):
     def get_Z(x, y, usable_ace):
         # if (x, y, usable_ace) in V:
