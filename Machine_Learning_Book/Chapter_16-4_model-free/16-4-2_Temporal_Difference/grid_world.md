@@ -1,0 +1,1 @@
+通用的格子世界请参考https://zhuanlan.zhihu.com/p/28109312

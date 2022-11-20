@@ -5,7 +5,7 @@ import gym
 from collections import defaultdict
 import numpy as np
 import sys
-sys.path.append('../..')
+sys.path.append('..')
 from utils import ob2state, plot_blackjack_values
 
 env = gym.make('Blackjack-v1')

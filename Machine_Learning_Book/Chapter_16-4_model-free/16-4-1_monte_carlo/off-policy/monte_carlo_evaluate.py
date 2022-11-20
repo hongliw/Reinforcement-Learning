@@ -7,7 +7,7 @@ off-policy策略评估
 import numpy as np
 import gym
 import sys
-sys.path.append('../..')
+sys.path.append('..')
 from utils import ob2state, plot_blackjack_values
 
 env = gym.make('Blackjack-v1')
